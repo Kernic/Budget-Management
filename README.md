@@ -6,7 +6,7 @@
 3. Should be as easy as possible
 
 ## Order: 
-- [ ] Configure the website
 - [ ] Configure the database
+- [ ] Configure the website
 - [ ] Configure the upload script
 - [ ] First Graphics
