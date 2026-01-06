@@ -4,5 +4,5 @@ import web.web as web
 if __name__ == "__main__":
     info = datab.DataManagement()
     website = web.website()
-    info.import_data()
+    info.init_random()
     website.run()
