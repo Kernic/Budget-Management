@@ -15,6 +15,7 @@ class DataManagement:
             print (f"Error {e}")
 
     def __open_data__(self, path: str):
+        # Transforming the raw data to a more usable data
         raw_data = pds.read_csv(path, encoding="cp1252", skiprows=10, sep=';', engine="c").drop("Unnamed: 4", axis=1)
         for col in ["Débit euros", "Crédit euros"]:
             raw_data[col] = raw_data[col].str.replace(",", ".").str.replace("\xa0", "").astype("float32")
@@ -34,11 +35,9 @@ class DataManagement:
         return raw_data
 
     def import_data(self):
-        sqlite_query = """INSERT INTO raw_data (id, name, operation_type, operator, operation, date)
-        VALUES (?, ?, ?, ?, ?, ?);"""
         data = self.__open_data__(r"../res/db/tmp/data.csv")
         if type(self.connection) != type(None):
-            data.to_sql(name="raw_data", con=self.connection, if_exists="reaplace")
+            data.to_sql(name="raw_data", con=self.connection, if_exists="replace")
 
     def close(self):
         self.connection.close()
