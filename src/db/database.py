@@ -11,6 +11,7 @@ class DataManagement:
     raw_data = None
     def __init__(self):
         self.connection = None
+        self.balance = 0.0
         try:
             self.connection = sqlite3.connect("../res/db/main.db")
         except Error as e:
@@ -26,16 +27,20 @@ class DataManagement:
         raw_data.drop("Crédit euros", axis=1, inplace=True)
         raw_data.drop("Débit euros", axis=1, inplace=True)
 
+        # To add, get current balance
+
         raw_data["operation type"] = raw_data["Libellé"].apply(
             lambda x : x.split("\n")[0].strip()
         )
         raw_data["operator"] = raw_data["Libellé"].apply(
             lambda x : x.split("\n")[1].split(" ")[0].strip()
-            if x.split("\n")[1].split(" ")[0].strip().startswith("X") else "OTHER"
+            if x.split("\n")[1].split(" ")[0].strip().startswith("X")
+            else "OTHER"
         )
         raw_data["name"] = raw_data["Libellé"].apply(
             lambda x : ' '.join(x.split("\n")[1].split(" ")[1:]).strip()
-            if x.split("\n")[1].split(" ")[0].strip().startswith("X") else x.split("\n")[1]
+            if x.split("\n")[1].split(" ")[0].strip().startswith("X")
+            else x.split("\n")[1]
         )
         raw_data.drop("Libellé", axis=1, inplace=True)
 
@@ -52,6 +57,9 @@ class DataManagement:
             "operation": [random.uniform(-1000.00, 1000.00) for _ in range(100)],
             "Date": [random.choices(["01/01/2026", "05/01/2026", "08/08/2026", "07/12/2025"])[0] for _ in range(100)]
         }
+
+        self.balance = random.uniform(1000.00, 5000.00)
+
         random_data = pds.DataFrame(random_data_list)
         print(random_data)
         if type(self.connection) != type(None):
@@ -62,6 +70,8 @@ class DataManagement:
         data = self.__open_data__(r"../res/db/tmp/data.csv")
         if type(self.connection) != type(None):
             data.to_sql(name="raw_data", con=self.connection, if_exists="replace")
+
+    # To Add Update data function
 
     def close(self):
         self.connection.close()
