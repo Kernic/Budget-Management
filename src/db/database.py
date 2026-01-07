@@ -1,8 +1,5 @@
-import io
 import random
 import string
-
-import numpy as np
 import pandas as pds
 import sqlite3
 from sqlite3 import Error
@@ -17,7 +14,8 @@ class DataManagement:
         except Error as e:
             print (f"Error {e}")
 
-    def __open_data__(self, path: str):
+    @staticmethod
+    def __open_data__(path: str):
         # Transforming the raw data to a more usable data
         raw_data = pds.read_csv(path, encoding="cp1252", skiprows=10, sep=';', engine="c").drop("Unnamed: 4", axis=1)
         for col in ["Débit euros", "Crédit euros"]:
@@ -43,10 +41,7 @@ class DataManagement:
             else x.split("\n")[1]
         )
         raw_data.drop("Libellé", axis=1, inplace=True)
-
         raw_data = raw_data[["name", "operation type", "operator", "operation", "Date"]]
-
-        print(raw_data.to_numpy().tolist())
         return raw_data
 
     def init_random(self):
@@ -58,12 +53,14 @@ class DataManagement:
             "Date": [random.choices(["01/01/2026", "05/01/2026", "08/08/2026", "07/12/2025"])[0] for _ in range(100)]
         }
 
-        self.balance = random.uniform(1000.00, 5000.00)
+        balance = random.uniform(1000.00, 5000.00)
 
         random_data = pds.DataFrame(random_data_list)
-        print(random_data)
         if type(self.connection) != type(None):
             random_data.to_sql(name="raw_data", con=self.connection, if_exists="replace")
+            cur = self.connection.cursor()
+            cur.execute("INSERT INTO globals (id, balance) VALUES (?, ?)", (0, balance))
+            self.connection.commit()
         pass
 
     def import_data(self):
@@ -72,6 +69,11 @@ class DataManagement:
             data.to_sql(name="raw_data", con=self.connection, if_exists="replace")
 
     # To Add Update data function
+
+    def get_globals(self) -> list:
+        cur = self.connection.cursor()
+        cur.execute("SELECT * FROM globals")
+        return cur.fetchall()
 
     def close(self):
         self.connection.close()

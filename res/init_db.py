@@ -34,5 +34,9 @@ if __name__ == "__main__":
     if type(connection) != type(None):
         empty_data.to_sql(name="raw_data", con=connection, if_exists="replace")
         # To Add empty table with global variable like balance, last update
+        curr = connection.cursor()
+        curr.execute("CREATE TABLE IF NOT EXISTS globals (id INTEGER PRIMARY KEY, balance REAL);")
+        connection.commit()
 
+    connection.close()
     pass
