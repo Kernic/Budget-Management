@@ -1,6 +1,29 @@
 import sqlite3 as sql
 from sqlite3 import Connection, Cursor
 
+import pandas as pds
+
+# ------------------------------------------------------------------------------#
+# Database Getting values
+# ------------------------------------------------------------------------------#
+
+
+def get_values_as_dataframe(query: str) -> pds.DataFrame:
+    conn = open_connection()
+    df = pds.read_sql_query(query, conn)
+    close_connection(conn)
+    return df
+
+
+def get_value(query: str) -> str:
+    conn = open_connection()
+    cursor = return_cursor(conn)
+    cursor.execute(query)
+    result = cursor.fetchone()
+    close_connection(conn)
+    return result[0]
+
+
 # ------------------------------------------------------------------------------#
 # Database connection functions
 # ------------------------------------------------------------------------------#
@@ -10,7 +33,7 @@ def open_connection() -> Connection:
     """
     Open a connection to the SQLite database.
     """
-    conn = sql.connect("./res/data/db.sql")
+    conn = sql.connect("../res/data/db.sql")
     return conn
 
 
@@ -29,19 +52,9 @@ def close_connection(conn: Connection) -> None:
     conn.close()
 
 
-# ------------------------------------------------------------------------------#
-# Temporary database functions
-# ------------------------------------------------------------------------------#
-
-
-# ------------------------------------------------------------------------------#
-# Temporary database functions
-# ------------------------------------------------------------------------------#
-
-
 def create_tables() -> None:
     """
-    Creating the default tables for the poject, do not use in main
+    Creating the default tables for the project, do not use in main
     """
     conn = open_connection()
     cursor = return_cursor(conn)
@@ -62,6 +75,19 @@ def create_tables() -> None:
             value REAL NOT NULL
         );
     """)
+
+    cursor.execute("""
+        INSERT INTO global_values (key, value) VALUES ('balance', '0.0');
+    """)
+
+    cursor.execute("""
+        INSERT INTO global_values (key, value) VALUES ('last_update_date', '01/01/0001');
+    """)
+
+    cursor.execute("""
+        INSERT INTO global_values (key, value) VALUES ('oldest_date', '31/12/9999');
+    """)
+
     conn.commit()
     close_connection(conn)
 

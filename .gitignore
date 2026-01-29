@@ -207,4 +207,5 @@ marimo/_lsp/
 __marimo__/
 
 # Personal exeptions
-*.sqlite3
+*.sql
+*.csv

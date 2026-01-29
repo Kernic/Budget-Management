@@ -7,7 +7,7 @@ app = dash.Dash(
     __name__,
     use_pages=True,
     pages_folder="web",
-    external_stylesheets=[dbc.themes.MORPH],
+    external_stylesheets=[dbc.themes.FLATLY],
 )
 
 # Creating elements for all the pages
@@ -15,7 +15,7 @@ nav_bar = dbc.NavbarSimple(
     children=dbc.Nav(
         [
             dbc.NavItem(
-                dbc.NavLink(f"{page['name']}", href=page["path"]),
+                dbc.NavLink(dcc.Markdown(f"###### {page['name']}"), href=page["path"]),
                 id=f"tooltip-target{page['name']}",
                 style={"textAlign": "center"},
             )
@@ -23,7 +23,7 @@ nav_bar = dbc.NavbarSimple(
         ],
         navbar=True,
     ),
-    brand="Budget Management App",
+    brand=dcc.Markdown("### Budget Management App"),
     brand_href="/",
     color="primary",
     dark=True,
