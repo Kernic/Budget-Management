@@ -51,24 +51,19 @@ older_date_card = dbc.Card(
 )
 
 # Month Balance Card
-month_bal_dts = float(
-    get_value(
-        "SELECT SUM(amount) FROM operations WHERE strftime('%Y', date) = strftime('%Y', 'now') AND strftime('%m', date) = strftime('%m', 'now');"
-    )
+q_result = get_value(
+    "SELECT SUM(amount) FROM operations WHERE strftime('%Y', date) = strftime('%Y', 'now') AND strftime('%m', date) = strftime('%m', 'now');"
 )
+month_bal = float(bal_val) - float(q_result if q_result is not None else 0)
 month_dts_card = dbc.Card(
     [
         dbc.CardHeader(dcc.Markdown("#### Month Balance")),
         dbc.CardBody(
-            dcc.Markdown(f"##### {month_bal_dts:.2f} €", style={"textAlign": "center"})
+            dcc.Markdown(f"##### {month_bal:.2f} €", style={"textAlign": "center"})
         ),
     ],
     color=(
-        "success"
-        if month_bal_dts >= 500
-        else "warning"
-        if month_bal_dts >= 0
-        else "danger"
+        "success" if month_bal >= 500 else "warning" if month_bal >= 0 else "danger"
     ),
     inverse=True,
 )
@@ -110,20 +105,23 @@ operations_fig.update_xaxes(
     range=[
         datetime.datetime.strptime(last_update, "%d/%m/%Y")
         - datetime.timedelta(days=30),
-        datetime.datetime.strptime(last_update, "%d/%m/%Y"),
+        datetime.datetime.strptime(last_update, "%d/%m/%Y")
+        + datetime.timedelta(days=1),
     ],
 )
 operations_fig.update_yaxes(
     title="Balance (€)",
     tickformat=".2f",
     range=[
-        grouped_dts[grouped_dts["date"].dt.month == datetime.datetime.now().month][
-            "results"
-        ].min()
+        grouped_dts[
+            grouped_dts["date"].dt.month
+            == datetime.datetime.strptime(last_update, "%d/%m/%Y").month
+        ]["results"].min()
         - 100,
-        grouped_dts[grouped_dts["date"].dt.month == datetime.datetime.now().month][
-            "date_balance"
-        ].max()
+        grouped_dts[
+            grouped_dts["date"].dt.month
+            == datetime.datetime.strptime(last_update, "%d/%m/%Y").month
+        ]["date_balance"].max()
         + 100,
     ],
 )

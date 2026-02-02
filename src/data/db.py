@@ -24,6 +24,20 @@ def get_value(query: str) -> str:
     return result[0]
 
 
+def insert_values_as_dataframe(table: str, df: pds.DataFrame) -> None:
+    conn = open_connection()
+    df.to_sql(table, conn, if_exists="append", index=False)
+    close_connection(conn)
+
+
+def update_value(table: str, column: str, index: int, value: str) -> None:
+    conn = open_connection()
+    cursor = return_cursor(conn)
+    cursor.execute(f"UPDATE {table} SET {column} = ? WHERE id = ?", (value, index))
+    conn.commit()
+    close_connection(conn)
+
+
 # ------------------------------------------------------------------------------#
 # Database connection functions
 # ------------------------------------------------------------------------------#
